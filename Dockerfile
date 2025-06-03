@@ -33,8 +33,6 @@ COPY --from=builder /app/prisma ./prisma
 # (Optionnel) Regénérer Prisma en cas d’outils runtime
 RUN npx prisma generate
 
-# Expose le port
-EXPOSE 3000
-
-# Commande de lancement
-CMD ["node", "dist/main"]
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+CMD ["./entrypoint.sh"]
