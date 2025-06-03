@@ -1,0 +1,76 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Conversation {
+  createdAt: DateTime!
+  id: ID!
+  lastActivity: DateTime!
+  messages: [Message!]
+  participants: [User!]!
+  title: String
+  updatedAt: DateTime!
+}
+
+input CreateConversationInput {
+  participantIds: [String!]!
+  title: String
+}
+
+input CreateMessageInput {
+  content: String!
+  conversationId: String!
+}
+
+input CreateUserInput {
+  avatarUrl: String
+  email: String!
+  username: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type HealthCheckResult {
+  result: String!
+}
+
+type Message {
+  content: String!
+  conversation: Conversation!
+  createdAt: DateTime!
+  id: ID!
+  isRead: Boolean!
+  sender: User!
+  updatedAt: DateTime!
+}
+
+type Mutation {
+  createConversation(createConversationInput: CreateConversationInput!): Conversation!
+  createMessage(createMessageInput: CreateMessageInput!, senderId: ID!): Message!
+  createUser(createUserInput: CreateUserInput!): User!
+}
+
+type Query {
+  conversation(id: String!): Conversation
+  conversationMessages(conversationId: String!): [Message!]!
+  conversations: [Conversation!]!
+  healthCheck: HealthCheckResult!
+  message(id: String!): Message
+  messages: [Message!]!
+  user(id: String!): User
+  userConversations(userId: String!): [Conversation!]!
+  users: [User!]!
+}
+
+type User {
+  avatarUrl: String
+  conversations: [Conversation!]
+  createdAt: DateTime!
+  email: String!
+  id: ID!
+  updatedAt: DateTime!
+  username: String!
+}
