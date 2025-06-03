@@ -1,57 +1,52 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-
-import { Message } from './models/message.model';
 import { ConversationService } from '../conversation/conversation.service';
 import { UserService } from '../user/user.service';
-
+import { Message } from './models/message.model';
+import { MessageProducer } from './queues/message.producer';
 
 @Injectable()
 export class MessageService {
 
-
   private messages: Message[] = [];
-
 
   constructor(
     private conversationService: ConversationService,
     private userService: UserService,
+    private messageProducer: MessageProducer,
   ) {}
-
 
   findAll(): Message[] {
     return this.messages;
   }
 
-
   findOneById(id: string): Message | undefined {
-    return this.messages.find(message => message.id === id);
+    return this.messages.find(m => m.id === id);
   }
-
 
   findByConversationId(conversationId: string): Message[] {
-    return this.messages.filter(message => message.conversation.id === conversationId);
+    return this.messages.filter(m => m.conversation.id === conversationId);
   }
 
-
-  createMessage(createMessageInput: any, senderId: string): Message {
-    
+  async createMessage(createMessageInput: any, senderId: string): Promise<Message> {
     const conversation = this.conversationService.findOneById(createMessageInput.conversationId);
-    if (!conversation) {
-      throw new Error('Conversation not found');
-    }
+    if (!conversation) throw new Error('Conversation not found');
 
     const sender = this.userService.findOneById(senderId);
-    if (!sender) {
-      throw new Error('Sender not found');
-    }
+    if (!sender) throw new Error('Sender not found');
 
     if (!conversation.participants.some(p => p.id === senderId)) {
       throw new Error('Sender is not a participant in this conversation');
     }
 
-    const newMessage: Message = {
-      id: uuidv4(),
+    await this.messageProducer.enqueueNewMessage({
+      content: createMessageInput.content,
+      conversationId: conversation.id,
+      senderId: sender.id,
+    });
+
+    return {
+      id: 'pending',
       content: createMessageInput.content,
       sender,
       conversation,
@@ -59,12 +54,34 @@ export class MessageService {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-
-    this.messages.push(newMessage);
-    
-    return newMessage;
-
   }
 
+  saveFromQueue({
+    content,
+    conversationId,
+    senderId,
+  }: {
+    content: string;
+    conversationId: string;
+    senderId: string;
+  }): Message {
+    const conversation = this.conversationService.findOneById(conversationId);
+    if (!conversation) throw new Error('Conversation not found');
 
+    const sender = this.userService.findOneById(senderId);
+    if (!sender) throw new Error('Sender not found');
+
+    const message: Message = {
+      id: uuidv4(),
+      content,
+      sender,
+      conversation,
+      isRead: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    this.messages.push(message);
+    return message;
+  }
 }

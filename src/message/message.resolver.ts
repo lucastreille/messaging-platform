@@ -30,12 +30,10 @@ export class MessageResolver {
 
 
   @Mutation(() => Message)
-  createMessage(
+  async createMessage(
     @Args('createMessageInput') createMessageInput: CreateMessageInput,
     @Args('senderId') senderId: string,
-  ): Message {
+  ): Promise<Message> {
     return this.messageService.createMessage(createMessageInput, senderId);
   }
-
-
 }
