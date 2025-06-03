@@ -13,7 +13,7 @@ export class MessageProducer {
   }) {
     await this.messageQueue.add('new-message', data, {
       attempts: 3,
-      removeOnComplete: true,
+      removeOnComplete: false,
       removeOnFail: false,
     });
 
