@@ -9,11 +9,15 @@ COPY package*.json ./
 # Installation des dépendances
 RUN npm ci
 
-# Copie du code source
+# Copie du code source + Prisma
 COPY . .
+COPY prisma ./prisma
 
 # Build de l'app NestJS
 RUN npm run build
+
+# Génère le client Prisma
+RUN npx prisma generate
 
 # Étape 2 : Image de production
 FROM node:18-alpine
@@ -24,8 +28,12 @@ WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/prisma ./prisma
 
-# Expose le port (adapter si besoin)
+# (Optionnel) Regénérer Prisma en cas d’outils runtime
+RUN npx prisma generate
+
+# Expose le port
 EXPOSE 3000
 
 # Commande de lancement
