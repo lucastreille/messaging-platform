@@ -1,23 +1,32 @@
-# Dockerfile
-FROM node:18
+# Étape 1 : Builder
+FROM node:18-alpine AS builder
 
-# Créer un dossier pour l'app
 WORKDIR /app
 
-# Copier les fichiers package.json et package-lock.json
+# Copie des fichiers de config + dépendances
 COPY package*.json ./
 
-# Installer les dépendances
-RUN npm install
+# Installation des dépendances
+RUN npm ci
 
-# Copier le reste de l'application
+# Copie du code source
 COPY . .
 
 # Build de l'app NestJS
 RUN npm run build
 
-# Exposer le port (ex : 3000)
+# Étape 2 : Image de production
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copie uniquement ce qui est nécessaire pour lancer l'app
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package*.json ./
+
+# Expose le port (adapter si besoin)
 EXPOSE 3000
 
-# Commande pour lancer l'app
+# Commande de lancement
 CMD ["node", "dist/main"]
