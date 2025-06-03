@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 env:
-  DOCKER_IMAGE: username/nestjs-messaging-app
+  DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/nestjs-messaging-app
   DOCKER_TAG: ${{ github.sha }}
 
 jobs:
