@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master-wt ]
   pull_request:
-    branches: [ master ]
+    branches: [ master-wt ]
 
 env:
   DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/nestjs-messaging-app
