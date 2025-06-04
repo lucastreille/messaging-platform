@@ -13,13 +13,14 @@ import { HealthCheckModule } from './health-check/health-check.module';
 import { UserModule } from './user/user.module';
 import { ConversationModule } from './conversation/conversation.module';
 import { MessageModule } from './message/message.module';
+console.log(`Connexion Redis -> host: ${process.env.REDIS_HOST}, port: ${process.env.REDIS_PORT}`);
 
 @Module({
   imports: [
     BullModule.forRoot({
       redis: {
-        host: 'localhost',
-        port: 6379,
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379', 10),
       },
     }),
 

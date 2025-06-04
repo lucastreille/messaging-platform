@@ -7,7 +7,11 @@ async function bootstrap() {
 
   // Configuration CORS
   const corsOptions: CorsOptions = {
-    origin: ['http://localhost:3001', 'http://localhost:3000'],
+   origin: [
+      'http://localhost:3001', 
+      'http://localhost:3000', 
+      'http://localhost:3002'
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
     allowedHeaders: [
@@ -22,10 +26,11 @@ async function bootstrap() {
 
   app.enableCors(corsOptions);
 
-  // Utilisez le port 3002 pour le backend pour éviter les conflits
-  const port = process.env.PORT ?? 3002;
+ const port = process.env.PORT || 3002;
   await app.listen(port);
-  console.log(`Application is running on: http://localhost:${port}`);
 }
 
-bootstrap();
+bootstrap().catch(error => {
+  console.error('Erreur lors du démarrage de l\'application:', error);
+  process.exit(1);
+});

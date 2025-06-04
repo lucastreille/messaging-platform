@@ -14,6 +14,8 @@ export class MessageConsumer {
 
   @Process('new-message')
   async handleNewMessage(job: Job) {
+        console.log('Message envoyé' );
+
     const { content, conversationId, senderId } = job.data;
 
     const message = this.messageService.saveFromQueue({
@@ -22,7 +24,6 @@ export class MessageConsumer {
       senderId,
     });
 
-    console.log('Message envoyé :', message);
 
     this.gateway.broadcastMessage(message);
   }
