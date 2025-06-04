@@ -56,22 +56,24 @@ jobs:
         context: .
         push: true
         tags: |
-          ${{ env.DOCKER_IMAGE }}:latest
-          ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+          docker.io/${{ env.DOCKER_IMAGE }}:latest
+          docker.io/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
-  deploy-to-render:
-    needs: docker-build-and-push
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master-wt'
+
+        
+
+  # deploy-to-render:
+  #   needs: docker-build-and-push
+  #   runs-on: ubuntu-latest
     
-    steps:
-    - name: Deploy to Render
-      run: |
-        curl -X POST \
-          -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-          -H "Accept: application/json" \
-          -H "Content-Type: application/json" \
-          -d '{"clearCache": false}' \
-          https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys
+  #   steps:
+  #   - name: Deploy to Render
+  #     run: |
+  #       curl -X POST \
+  #         -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+  #         -H "Accept: application/json" \
+  #         -H "Content-Type: application/json" \
+  #         -d '{"clearCache": false}' \
+  #         https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys
