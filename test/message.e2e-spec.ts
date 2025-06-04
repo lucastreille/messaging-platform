@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
+import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { PrismaClient } from '@prisma/client';
 import { createTestUser, createTestConversation } from './utils/factories';
@@ -62,6 +62,7 @@ describe('GraphQL - createMessage (e2e)', () => {
     await prisma.message.deleteMany();
     await prisma.conversation.deleteMany();
     await prisma.user.deleteMany();
+    await prisma.conversationParticipant.deleteMany();
   });
 
   afterAll(async () => {

@@ -14,14 +14,22 @@ export async function createTestUser() {
 }
 
 export async function createTestConversation(userIds: string[]) {
-  return prisma.conversation.create({
+  const conversation = await prisma.conversation.create({
     data: {
       id: uuid(),
       title: 'Test Conversation',
       lastActivity: new Date(),
-      participants: {
-        connect: userIds.map((id) => ({ id })),
-      },
     },
   });
+
+  for (const userId of userIds) {
+    await prisma.conversationParticipant.create({
+      data: {
+        userId,
+        conversationId: conversation.id,
+      },
+    });
+  }
+
+  return conversation;
 }
