@@ -41,44 +41,53 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      with:
-        driver-opts: |
-          image=moby/buildkit:v0.12.5
-
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
-        registry: docker.io
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v5
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ env.DOCKER_IMAGE }}:latest .
+        docker tag ${{ env.DOCKER_IMAGE }}:latest ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+
+    - name: Push Docker images
+      uses: nick-fields/retry@v3
       with:
-        context: .
-        push: true
-        platforms: linux/amd64
-        tags: |
-          docker.io/${{ env.DOCKER_IMAGE }}:latest
-          docker.io/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        provenance: false
-        sbom: false
+        timeout_minutes: 15
+        max_attempts: 3
+        retry_on: error
+        command: |
+          docker push ${{ env.DOCKER_IMAGE }}:latest
+          docker push ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+
+    - name: Clean up local images
+      run: |
+        docker rmi ${{ env.DOCKER_IMAGE }}:latest || true
+        docker rmi ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} || true
 
   deploy-to-render:
     needs: docker-build-and-push
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master-wt'
+    if: github.ref == 'refs/heads/master-wt' && github.event_name == 'push'
     
     steps:
     - name: Deploy to Render
+      uses: nick-fields/retry@v3
+      with:
+        timeout_minutes: 10
+        max_attempts: 3
+        retry_on: error
+        command: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -d '{"clearCache": false}' \
+            https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys
+
+    - name: Wait for deployment
       run: |
-        curl -X POST \
-          -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-          -H "Accept: application/json" \
-          -H "Content-Type: application/json" \
-          -d '{"clearCache": false}' \
-          https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys
+        echo "Deployment triggered successfully"
+        echo "Check your Render dashboard for deployment status"
