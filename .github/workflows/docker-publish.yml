@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master-wt ]
   pull_request:
-    branches: [ master ]
+    branches: [ master-wt ]
 
 env:
   DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/nestjs-messaging-app
@@ -64,7 +64,7 @@ jobs:
   deploy-to-render:
     needs: docker-build-and-push
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master-wt'
     
     steps:
     - name: Deploy to Render
