@@ -39,6 +39,21 @@ services:
       DATABASE_URL: postgresql://nestjs:nestjs@postgres:5432/nestjs_db?schema=public
     restart: unless-stopped
 
+  prisma-studio:
+    image: node:18-alpine
+    container_name: prisma-studio
+    working_dir: /app
+    volumes:
+      - ./:/app
+    command: sh -c "npm install && npx prisma generate && npx prisma studio --port 5555"
+    ports:
+      - "5555:5555"
+    environment:
+      DATABASE_URL: postgresql://nestjs:nestjs@postgres:5432/nestjs_db
+    depends_on:
+      - postgres
+
+
 volumes:
   redis-data:
   postgres-data:
