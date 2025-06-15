@@ -6,8 +6,8 @@ do
   sleep 1
 done
 
-echo "Postgres started, running migrations..."
+echo "Postgres is up. Running Prisma migrations..."
 npx prisma migrate deploy
 
-echo "Starting the NestJS app..."
+echo "Starting NestJS app..."
 node dist/main.js

@@ -1,55 +1,94 @@
 import { Injectable } from '@nestjs/common';
-import { Conversation } from './models/conversation.model';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateConversationInput } from './dto/create-conversation.input';
-import { UserService } from '../user/user.service';
-import { v4 as uuidv4 } from 'uuid';
+import { Conversation } from './models/conversation.model';
 
 @Injectable()
 export class ConversationService {
+  constructor(private readonly prisma: PrismaService) {}
 
-  private conversations: Conversation[] = [];
+  async findAll() {
+    const conversations = await this.prisma.conversation.findMany({
+      include: {
+        participants: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
 
-  constructor(private userService: UserService) {}
-
-
-  findAll(): Conversation[] {
-    return this.conversations;
+    return conversations.map((conv) => ({
+      ...conv,
+      participants: conv.participants.map((p) => p.user),
+    }));
   }
 
+  async findOneById(id: string): Promise<Conversation | null> {
+    const rawConversation = await this.prisma.conversation.findUnique({
+      where: { id },
+      include: {
+        participants: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
 
-  findOneById(id: string): Conversation | undefined {
-    return this.conversations.find(conversation => conversation.id === id);
-  }
+    if (!rawConversation) return null;
 
-
-  findByUserId(userId: string): Conversation[] {
-    return this.conversations.filter(conversation => 
-      conversation.participants.some(participant => participant.id === userId)
-    );
-  }
-
-
-  createConversation(createConversationInput: CreateConversationInput): Conversation {
-
-    const participants = this.userService.findByIds(createConversationInput.participantIds);
-    
-    if (participants.length < createConversationInput.participantIds.length) {
-      throw new Error('Some participants do not exist');
-    }
-
-    const newConversation: Conversation = {
-      id: uuidv4(),
-      title: createConversationInput.title || participants.map(p => p.username).join(', '),
-      participants,
-      lastActivity: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
+    return {
+      ...rawConversation,
+      participants: rawConversation.participants.map((p) => p.user),
     };
-
-    this.conversations.push(newConversation);
-    return newConversation;
-    
   }
 
+  async findByUserId(userId: string) {
+    const conversations = await this.prisma.conversation.findMany({
+      where: {
+        participants: {
+          some: { userId },
+        },
+      },
+      include: {
+        participants: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
 
+    return conversations.map((conv) => ({
+      ...conv,
+      participants: conv.participants.map((p) => p.user),
+    }));
+  }
+
+  async createConversation(input: CreateConversationInput) {
+    const conversation = await this.prisma.conversation.create({
+      data: {
+        title: input.title,
+        participants: {
+          create: input.participantIds.map((id) => ({
+            user: { connect: { id } },
+          })),
+        },
+        lastActivity: new Date(),
+      },
+      include: {
+        participants: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    return {
+      ...conversation,
+      participants: conversation.participants.map((p) => p.user),
+    };
+  }
 }

@@ -15,8 +15,8 @@ export class User {
   @Field()
   email: string;
 
-  @Field({ nullable: true })
-  avatarUrl?: string;
+  @Field(() => String, { nullable: true })
+  avatarUrl?: string | null;
 
   @Field(() => [Conversation], { nullable: true })
   conversations?: Conversation[];

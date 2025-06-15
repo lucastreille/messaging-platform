@@ -54,15 +54,19 @@ describe('GraphQL - createMessage (e2e)', () => {
 
     expect(response.status).toBe(200);
     expect(response.body.data.createMessage.content).toBe('Message de test');
-    expect(response.body.data.createMessage.sender.username).toBe(sender.username);
-    expect(response.body.data.createMessage.conversation.id).toBe(conversation.id);
+    expect(response.body.data.createMessage.sender.username).toBe(
+      sender.username,
+    );
+    expect(response.body.data.createMessage.conversation.id).toBe(
+      conversation.id,
+    );
   });
 
   afterEach(async () => {
     await prisma.message.deleteMany();
+    await prisma.conversationParticipant.deleteMany();
     await prisma.conversation.deleteMany();
     await prisma.user.deleteMany();
-    await prisma.conversationParticipant.deleteMany();
   });
 
   afterAll(async () => {
