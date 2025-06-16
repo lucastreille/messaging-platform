@@ -4,8 +4,10 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // ⚠️ En dur uniquement pour tests/déploiements rapides. À sécuriser via .env ensuite.
+  url      = "postgresql://nestjs:ozb02TGtC6gBrchh9WCHPvfrxeZylbo2@dpg-d17tma3uibrs7384okvg-a.oregon-postgres.render.com/nestjs_db_uce4"
 }
+
 
 model User {
   id           String         @id @default(uuid())
