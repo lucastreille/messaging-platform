@@ -19,10 +19,7 @@ describe('ConversationResolver', () => {
 
   });
 
-
   it('should be defined', () => {
     expect(resolver).toBeDefined();
   });
-
-  
 });

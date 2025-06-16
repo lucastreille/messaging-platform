@@ -4,12 +4,11 @@ import { Message } from '../../message/models/message.model';
 
 @ObjectType()
 export class Conversation {
-
   @Field(() => ID)
   id: string;
 
-  @Field({ nullable: true })
-  title?: string;
+  @Field(() => String, { nullable: true })
+  title?: string | null;
 
   @Field(() => [User])
   participants: User[];
@@ -25,5 +24,4 @@ export class Conversation {
 
   @Field()
   updatedAt: Date;
-  
 }

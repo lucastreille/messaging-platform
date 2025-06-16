@@ -1,40 +1,31 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-
 import { Conversation } from './models/conversation.model';
 import { ConversationService } from './conversation.service';
 import { CreateConversationInput } from './dto/create-conversation.input';
 
-
 @Resolver(() => Conversation)
 export class ConversationResolver {
-
-  constructor(private conversationService: ConversationService) {}
-
+  constructor(private readonly conversationService: ConversationService) {}
 
   @Query(() => [Conversation])
-  conversations(): Conversation[] {
+  async conversations(): Promise<Conversation[]> {
     return this.conversationService.findAll();
   }
 
-
   @Query(() => Conversation, { nullable: true })
-  conversation(@Args('id') id: string): Conversation | undefined {
+  async conversation(@Args('id') id: string): Promise<Conversation | null> {
     return this.conversationService.findOneById(id);
   }
 
-
   @Query(() => [Conversation])
-  userConversations(@Args('userId') userId: string): Conversation[] {
+  async userConversations(@Args('userId') userId: string): Promise<Conversation[]> {
     return this.conversationService.findByUserId(userId);
   }
 
-
   @Mutation(() => Conversation)
-  createConversation(
-    @Args('createConversationInput') createConversationInput: CreateConversationInput
-  ): Conversation {
+  async createConversation(
+    @Args('createConversationInput') createConversationInput: CreateConversationInput,
+  ): Promise<Conversation> {
     return this.conversationService.createConversation(createConversationInput);
   }
-  
-
 }

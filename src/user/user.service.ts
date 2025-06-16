@@ -1,37 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
+import { PrismaService } from '../prisma/prisma.service';
 
 import { User } from './models/user.model';
 import { CreateUserInput } from './dto/create-user.input';
 
 @Injectable()
 export class UserService {
-  private users: User[] = [];
-  constructor() {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  findAll(): User[] {
-    return this.users;
+  async findAll(): Promise<User[]> {
+    return this.prisma.user.findMany();
   }
 
-  findOneById(id: string): User | undefined {
-    return this.users.find((user) => user.id === id);
+  async findOneById(id: string): Promise<User | null> {
+    return this.prisma.user.findUnique({
+      where: { id },
+    });
   }
 
-  findByIds(ids: string[]): User[] {
-    return this.users.filter((user) => ids.includes(user.id));
+  async findByIds(ids: string[]): Promise<User[]> {
+    return this.prisma.user.findMany({
+      where: {
+        id: { in: ids },
+      },
+    });
   }
 
-  createUser(createUserInput: CreateUserInput): User {
-    const newUser: User = {
-      id: uuidv4(),
-      username: createUserInput.username,
-      email: createUserInput.email,
-      avatarUrl: createUserInput.avatarUrl,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    this.users.push(newUser);
-    return newUser;
+  async createUser(createUserInput: CreateUserInput): Promise<User> {
+    return this.prisma.user.create({
+      data: {
+        id: uuidv4(),
+        username: createUserInput.username,
+        email: createUserInput.email,
+        avatarUrl: createUserInput.avatarUrl ?? null,
+      },
+    });
   }
 }
