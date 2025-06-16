@@ -16,9 +16,15 @@ import { MessageModule } from './message/message.module';
 
 @Module({
   imports: [
-    BullModule.forRoot({
-      redis: "rediss://default:AW2eAAIjcDEyMzYwZmQ4Y2RhYmI0M2I1YWU4OWZlNzE3ODJjMWVjZHAxMA@dominant-frog-28062.upstash.io:6379",
-    }),
+  BullModule.forRoot({
+    redis: {
+      host: "dominant-frog-28062.upstash.io",
+      port: 6379,
+      password: "AW2eAAIjcDEyMzYwZmQ4Y2RhYmI0M2I1YWU4OWZlNzE3ODJjMWVjZHAxMA",
+      tls: {}, // Indique que tu veux activer TLS (même vide ça suffit)
+    }
+  }),
+
 
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
