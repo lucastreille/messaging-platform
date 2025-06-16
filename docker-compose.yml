@@ -10,18 +10,18 @@ services:
       - redis-data:/data
     restart: unless-stopped
 
-  postgres:
-    image: postgres:15
-    container_name: postgres-dev
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: nestjs
-      POSTGRES_PASSWORD: nestjs
-      POSTGRES_DB: nestjs_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
+  # postgres:
+  #   image: postgres:15
+  #   container_name: postgres-dev
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: nestjs
+  #     POSTGRES_PASSWORD: nestjs
+  #     POSTGRES_DB: nestjs_db
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
 
   app:
     build:
@@ -32,11 +32,11 @@ services:
       - '3002:3002'
     depends_on:
       - redis
-      - postgres
+      # - postgres
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      DATABASE_URL: postgresql://nestjs:nestjs@postgres:5432/nestjs_db?schema=public
+      DATABASE_URL: ${DATABASE_URL}
     restart: unless-stopped
 
   prisma-studio:
@@ -49,11 +49,11 @@ services:
     ports:
       - "5555:5555"
     environment:
-      DATABASE_URL: postgresql://nestjs:nestjs@postgres:5432/nestjs_db
-    depends_on:
-      - postgres
+      DATABASE_URL: ${DATABASE_URL}
+    # depends_on:
+    #   - postgres
 
 
 volumes:
   redis-data:
-  postgres-data:
+  # postgres-data:
