@@ -13,15 +13,12 @@ import { HealthCheckModule } from './health-check/health-check.module';
 import { UserModule } from './user/user.module';
 import { ConversationModule } from './conversation/conversation.module';
 import { MessageModule } from './message/message.module';
-console.log(`Connexion Redis -> host: ${process.env.REDIS_HOST}, port: ${process.env.REDIS_PORT}`);
+console.log(`Connexion Redis -> URL: ${process.env.REDIS_URL}`);
 
 @Module({
   imports: [
     BullModule.forRoot({
-      redis: {
-        host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379', 10),
-      },
+      redis: process.env.REDIS_URL,
     }),
 
     GraphQLModule.forRoot<ApolloDriverConfig>({

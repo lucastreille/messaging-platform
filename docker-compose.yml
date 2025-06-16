@@ -12,7 +12,6 @@ services:
     environment:
       REDIS_URL: ${REDIS_URL}
       DATABASE_URL: ${DATABASE_URL}
-
     restart: unless-stopped
 
   prisma-studio:
