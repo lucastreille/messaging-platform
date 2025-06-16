@@ -14,6 +14,7 @@ COPY .env .env
 RUN npm run build
 
 RUN npx prisma generate --schema=src/prisma/schema.prisma
+RUN npx prisma migrate deploy --schema=src/prisma/schema.prisma
 
 FROM node:18-alpine
 
