@@ -13,12 +13,11 @@ import { HealthCheckModule } from './health-check/health-check.module';
 import { UserModule } from './user/user.module';
 import { ConversationModule } from './conversation/conversation.module';
 import { MessageModule } from './message/message.module';
-console.log(`Connexion Redis -> URL: ${process.env.REDIS_URL}`);
 
 @Module({
   imports: [
     BullModule.forRoot({
-      redis: process.env.REDIS_URL,
+      redis: "rediss://default:AW2eAAIjcDEyMzYwZmQ4Y2RhYmI0M2I1YWU4OWZlNzE3ODJjMWVjZHAxMA@dominant-frog-28062.upstash.io:6379",
     }),
 
     GraphQLModule.forRoot<ApolloDriverConfig>({
