@@ -10,7 +10,7 @@ services:
     ports:
       - '3002:3002'
     environment:
-      REDIS_URL: ${REDIS_URL}
+      REDIS_URL: rediss://default:AW2eAAIjcDEyMzYwZmQ4Y2RhYmI0M2I1YWU4OWZlNzE3ODJjMWVjZHAxMA@dominant-frog-28062.upstash.io:6379
       DATABASE_URL: ${DATABASE_URL}
     restart: unless-stopped
 
