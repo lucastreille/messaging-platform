@@ -9,6 +9,7 @@ COPY . .
 COPY tsconfig.json ./
 
 COPY src/prisma ./src/prisma
+COPY .env .env
 
 RUN npm run build
 
@@ -17,6 +18,7 @@ RUN npx prisma generate --schema=src/prisma/schema.prisma
 FROM node:18-alpine
 
 WORKDIR /app
+
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
