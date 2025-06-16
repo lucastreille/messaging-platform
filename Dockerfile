@@ -9,7 +9,7 @@ COPY . .
 COPY tsconfig.json ./
 
 COPY src/prisma ./src/prisma
-COPY .env /app/config/
+COPY .env .env
 
 RUN npm run build
 
