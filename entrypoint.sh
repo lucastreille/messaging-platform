@@ -6,7 +6,8 @@ do
   sleep 1
 done
 
-echo "Postgres is up. Running Prisma migrations..."
+echo "Postgres is up. Running Prisma generate and migrations..."
+npx prisma generate
 npx prisma migrate deploy
 
 echo "Starting NestJS app..."
