@@ -21,7 +21,7 @@ import { MessageModule } from './message/message.module';
       host: "dominant-frog-28062.upstash.io",
       port: 6379,
       password: "AW2eAAIjcDEyMzYwZmQ4Y2RhYmI0M2I1YWU4OWZlNzE3ODJjMWVjZHAxMA",
-      tls: {}, // Indique que tu veux activer TLS (même vide ça suffit)
+      tls: {},
     }
   }),
 
